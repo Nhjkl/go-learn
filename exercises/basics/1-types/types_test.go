@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math"
 	"testing"
 	"unsafe"
@@ -243,6 +242,9 @@ func TestPointer(t *testing.T) {
 	t.Logf("修改后x的值为: %d\n", x)
 
 	// // 指针作为函数参数
+	increment := func(p *int) {
+		*p++
+	}
 	increment(&x)
 	t.Logf("函数修改后x的值为: %d\n", x)
 
@@ -254,33 +256,44 @@ func TestPointer(t *testing.T) {
 	//
 
 	// // ===== 值传递 vs 指针传递 =====
-	fmt.Println("\n=== 值传递 vs 指针传递 ===")
+	t.Log("=== 值传递 vs 指针传递 ===")
 
 	// 值传递示例
 	a := 10
 	t.Logf("调用前 a = %d\n", a)
+	valuePass := func(num int) {
+		t.Logf("  函数内接收到的值: %d\n", num)
+		num = 100 // 修改副本，不影响原值
+		t.Logf("  函数内修改后: %d\n", num)
+	}
 	valuePass(a)
 	t.Logf("调用后 a = %d (值未改变)\n", a)
 
 	// 指针传递示例
 	b := 10
 	t.Logf("\n调用前 b = %d\n", b)
+	pointerPass := func(num *int) {
+		t.Logf("  函数内接收到的地址: %p\n", num)
+		t.Logf("  函数内接收到的值: %d\n", *num)
+		*num = 100 // 通过指针修改原值
+		t.Logf("  函数内修改后: %d\n", *num)
+	}
 	pointerPass(&b)
 	t.Logf("调用后 b = %d (值已改变)\n", b)
 
 	// // 详细说明
-	fmt.Println("\n关键区别：")
-	fmt.Println("1. 值传递：函数接收的是值的副本，修改副本不影响原值")
-	fmt.Println("2. 指针传递：函数接收的是地址，通过地址可以直接修改原值")
+	t.Log("关键区别：")
+	t.Log("1. 值传递：函数接收的是值的副本，修改副本不影响原值")
+	t.Log("2. 指针传递：函数接收的是地址，通过地址可以直接修改原值")
 }
 
 func TestDemonstrateSliceGrowth(t *testing.T) {
 	var s []int
 	t.Log("开始扩容演示：")
 
-	for i := 0; i < 20; i++ {
+	for i := 0; i < 100; i++ {
 		oldCap := cap(s)
-		fmt.Print(oldCap)
+		// t.Log(oldCap)
 		s = append(s, i)
 		newCap := cap(s)
 
@@ -292,21 +305,6 @@ func TestDemonstrateSliceGrowth(t *testing.T) {
 				i, len(s), cap(s))
 		}
 	}
-}
 
-func pointerPass(num *int) {
-	fmt.Printf("  函数内接收到的地址: %p\n", num)
-	fmt.Printf("  函数内接收到的值: %d\n", *num)
-	*num = 100 // 通过指针修改原值
-	fmt.Printf("  函数内修改后: %d\n", *num)
-}
-
-func valuePass(num int) {
-	fmt.Printf("  函数内接收到的值: %d\n", num)
-	num = 100 // 修改副本，不影响原值
-	fmt.Printf("  函数内修改后: %d\n", num)
-}
-
-func increment(p *int) {
-	*p++
+	t.Log("发生扩容是，再原来的cap上乘以2")
 }
