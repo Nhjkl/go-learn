@@ -6,10 +6,9 @@ import (
 )
 
 // 定义结构体
-
 type Person struct {
 	Name string
-	Age  int8
+	Age  int
 }
 
 // 接收值
